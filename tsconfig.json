@@ -6,7 +6,9 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-
+    "paths": {
+      "@mui/styled-engine": ["./node_modules/@mui/styled-engine-sc"]
+    },
     /* Bundler mode */
     "moduleResolution": "node",
     "resolveJsonModule": true,
