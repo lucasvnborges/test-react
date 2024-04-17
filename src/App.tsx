@@ -1,15 +1,13 @@
-import { useState } from "react";
+import { Routes, Route } from 'react-router-dom'
+import { CustomerList, CreateCustomer } from './screens'
 
-function App() {
-  const [count, setCount] = useState(0);
-
+export default function App() {
   return (
-    <div>
-      <button onClick={() => setCount((count) => count + 1)}>
-        count is {count}
-      </button>
-    </div>
-  );
+    <Routes>
+      <Route path="/">
+        <Route index element={<CustomerList />} />
+        <Route path="novo-cliente" element={<CreateCustomer />} />
+      </Route>
+    </Routes>
+  )
 }
-
-export default App;
