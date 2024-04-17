@@ -18,7 +18,7 @@ const individualSchema = z.object({
 const corporateSchema = z.object({
   type: z.literal('PJ'),
   name: z.string(),
-  companyName: z.string(),
+  company_name: z.string(),
   cnpj: z.string().length(14),
   email: z.string().email(),
   phone: z
