@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 // Schema for individual (PF) customers
-const individualSchema = z.object({
+const IndividualSchema = z.object({
   type: z.literal('PF'),
   name: z.string(),
   cpf: z.string().length(11),
@@ -15,7 +15,7 @@ const individualSchema = z.object({
 })
 
 // Schema for corporate (PJ) customers
-const corporateSchema = z.object({
+const CorporateSchema = z.object({
   type: z.literal('PJ'),
   name: z.string(),
   company_name: z.string(),
@@ -29,4 +29,4 @@ const corporateSchema = z.object({
     }),
 })
 
-export const customerSchema = z.union([individualSchema, corporateSchema])
+export const CustomerSchema = z.union([IndividualSchema, CorporateSchema])
