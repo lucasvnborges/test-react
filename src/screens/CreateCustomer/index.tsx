@@ -1,13 +1,15 @@
 import { z } from 'zod'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CustomerSchema } from 'src/models/customer'
-import { Button, Container, TextField } from '@mui/material'
-import Menu from './Menu'
+import { Button, Container, Grid, TextField, Typography } from '@mui/material'
+import { Menu } from 'src/components'
 
 type CustomerDataType = z.infer<typeof CustomerSchema>
 
 export default function CreateCustomer() {
+  // hooks
   const {
     register,
     handleSubmit,
@@ -15,49 +17,90 @@ export default function CreateCustomer() {
   } = useForm<CustomerDataType>({
     resolver: zodResolver(CustomerSchema),
   })
+  // state
+  const [isCompany, setIsCompany] = useState(true)
 
   const onSubmit = (data: CustomerDataType) => console.log(data)
 
   return (
-    <Container
-      maxWidth="lg"
-      sx={{
-        height: '90vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'column',
-      }}
-    >
+    <Container maxWidth="md" sx={{ mt: 6 }}>
+      {errors.type && <span>{errors.type.message}</span>}
+      {errors.name && <span>{errors.name.message}</span>}
+      {errors.cpf && <span>{errors.cpf.message}</span>}
+      {errors.email && <span>{errors.email.message}</span>}
+      {errors.phone && <span>{errors.phone.message}</span>}
+      {errors.fantasy_name && <span>{errors.fantasy_name.message}</span>}
+
+      <Typography variant="h5" mb={3}>
+        Cadastrar novo cliente
+      </Typography>
+
       <Menu />
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        style={{
-          width: '40%',
-          maxWidth: '40%',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <TextField
-          label="Nome"
-          variant="outlined"
-          error={!!errors.name}
-          style={{ marginBottom: '20px' }}
-          {...register('name', { required: true })}
-          helperText={errors.name && 'Nome é obrigatório'}
-        />
-        <TextField
-          label="Email"
-          variant="outlined"
-          error={!!errors.email}
-          style={{ marginBottom: '20px' }}
-          {...register('email', { required: true })}
-          helperText={errors.email && 'Email é obrigatório'}
-        />
-        <Button variant="contained" color="primary" type="submit">
-          Cadastrar
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Grid container spacing={3} mb={3}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              id="cnpj"
+              label="CNPJ"
+              error={!!errors.cnpj}
+              {...register('cnpj', { required: true })}
+              helperText={errors.cnpj && 'CNPJ é obrigatório'}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              id="name"
+              error={!!errors.name}
+              {...register('name', { required: true })}
+              helperText={errors.name && 'Nome é obrigatório'}
+              label={isCompany ? 'Nome da empresa' : 'Nome completo'}
+            />
+          </Grid>
+
+          {isCompany && (
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                id="fantasy_name"
+                label="Nome fantasia"
+                error={!!errors.fantasy_name}
+                {...register('fantasy_name', { required: true })}
+                helperText={
+                  errors.fantasy_name && 'Nome fantasia é obrigatório'
+                }
+              />
+            </Grid>
+          )}
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              id="email"
+              label="E-mail"
+              error={!!errors.email}
+              {...register('email', { required: true })}
+              helperText={errors.email && 'E-mail é obrigatório'}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              id="phone"
+              label="Telefone"
+              error={!!errors.phone}
+              {...register('phone', { required: true })}
+              helperText={errors.phone && 'Telefone é obrigatório'}
+            />
+          </Grid>
+        </Grid>
+
+        <Button type="submit" variant="contained">
+          Salvar
         </Button>
       </form>
     </Container>
