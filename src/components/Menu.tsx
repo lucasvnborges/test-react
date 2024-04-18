@@ -19,7 +19,7 @@ const Option = styled(Box)<OptionProps>`
 
 export default function Menu() {
   return (
-    <Stack direction="row" spacing={2} mb={4} sx={{ width: '40%' }}>
+    <Stack direction="row" spacing={2} mb={4}>
       <Option selected>Pessoa Física</Option>
       <Option>Pessoa Jurídica</Option>
     </Stack>
