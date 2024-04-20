@@ -1,30 +1,30 @@
-import { http, HttpResponse } from "msw";
-import { SessionStorageMap } from "./sessionStorage";
+import { http, HttpResponse } from 'msw'
+import { SessionStorageMap } from './sessionStorage'
 
-const storage = new SessionStorageMap<string, any>();
+const storage = new SessionStorageMap<string, any>()
 
 export const handlers = [
-  http.get("/clientes", () => {
-    return HttpResponse.json(Array.from(storage.values()));
+  http.get('/clientes', () => {
+    return HttpResponse.json(Array.from(storage.values()))
   }),
 
-  http.post("/clientes", ({ request }) => {
-    const id = Date.now().toString();
-    const cliente = { ...request.body, id };
-    storage.set(id, cliente);
-    return HttpResponse.json(cliente);
+  http.post('/clientes', async ({ request }) => {
+    const id = Date.now().toString()
+    const customer = await request.json()
+    storage.set(id, customer)
+    return HttpResponse.json({ id: 1 })
   }),
 
-  http.put("/clientes/:id", ({ params, request }) => {
-    const { id } = params;
-    const cliente = { ...request.body, id };
-    storage.set(id.toString(), cliente);
-    return HttpResponse.json(cliente);
+  http.put('/clientes/:id', async ({ params, request }) => {
+    // const { id } = params
+    // const customer = await request.json()
+    // storage.set(id.toString(), customer)
+    // return HttpResponse.json(customer)
   }),
 
-  http.delete("/clientes/:id", ({ params }) => {
-    const { id } = params;
-    storage.delete(id.toString());
-    return new HttpResponse("Success", { status: 200 });
+  http.delete('/clientes/:id', ({ params }) => {
+    const { id } = params
+    storage.delete(id.toString())
+    return new HttpResponse('Success', { status: 200 })
   }),
-];
+]
