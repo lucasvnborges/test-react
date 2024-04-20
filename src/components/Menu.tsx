@@ -1,12 +1,16 @@
 import styled from 'styled-components'
-import { Box, Stack } from '@mui/material'
+import { Box, Grid } from '@mui/material'
+import { Business, Person } from '@mui/icons-material'
 
-type OptionProps = {
+interface OptionProps {
   selected?: boolean
 }
 
+interface Props extends OptionProps {
+  onChange: () => null
+}
+
 const Option = styled(Box)<OptionProps>`
-  flex: 1;
   display: flex;
   cursor: pointer;
   align-items: center;
@@ -17,11 +21,30 @@ const Option = styled(Box)<OptionProps>`
   background-color: ${({ selected }) => (selected ? '#f1f1f1' : '#ffffff')};
 `
 
-export default function Menu() {
+const IconWrapper = styled.div`
+  margin-right: 6px;
+`
+
+export default function Menu({ selected, onChange }: Props) {
   return (
-    <Stack direction="row" spacing={2} mb={4}>
-      <Option selected>Pessoa Física</Option>
-      <Option>Pessoa Jurídica</Option>
-    </Stack>
+    <Grid container spacing={3} mb={3}>
+      <Grid item xs={12} sm={6}>
+        <Option selected={selected}>
+          <IconWrapper>
+            <Person />
+          </IconWrapper>
+          Pessoa Física
+        </Option>
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <Option selected={selected}>
+          <IconWrapper>
+            <Business />
+          </IconWrapper>
+          Pessoa Jurídica
+        </Option>
+      </Grid>
+    </Grid>
   )
 }
