@@ -9,3 +9,5 @@ export const CustomerSchema = z.object({
   email: z.string(),
   phone: z.string(),
 })
+
+export type CustomerDataType = z.infer<typeof CustomerSchema>
