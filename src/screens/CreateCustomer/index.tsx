@@ -1,12 +1,9 @@
-import { z } from 'zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CustomerSchema } from 'src/models/customer'
+import { CustomerDataType, CustomerSchema } from 'src/models/customer'
 import { Button, Container, Grid, TextField, Typography } from '@mui/material'
 import { Menu } from 'src/components'
-
-type CustomerDataType = z.infer<typeof CustomerSchema>
 
 export default function CreateCustomer() {
   // hooks
@@ -14,13 +11,37 @@ export default function CreateCustomer() {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<CustomerDataType>({
+    defaultValues: {
+      type: 'PJ',
+    },
     resolver: zodResolver(CustomerSchema),
   })
   // state
   const [isCompany, setIsCompany] = useState(true)
 
-  const onSubmit = (data: CustomerDataType) => console.log(data)
+  const createUser = (customer: CustomerDataType) => {
+    fetch('/clientes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(customer)
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Erro ao criar cliente')
+        }
+
+        reset();
+      })
+      .catch((error) => {
+        console.error('Erro ao criar cliente:', error)
+      })
+  }
+
+  const onSubmit = (data: CustomerDataType) => createUser(data)
 
   return (
     <Container maxWidth="md" sx={{ mt: 6 }}>
