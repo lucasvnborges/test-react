@@ -3,7 +3,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CustomerDataType, CustomerSchema } from 'src/models/customer'
 import { Button, Container, Grid, TextField, Typography } from '@mui/material'
-import { Menu } from 'src/components'
+import { Business, Person } from '@mui/icons-material'
+import { CustomerTypeMenu } from 'src/components'
+
+const menuOptions = [
+  { value: 'PF', label: 'Pessoa Física', icon: <Person /> },
+  { value: 'PJ', label: 'Pessoa Jurídica', icon: <Business /> },
+]
 
 export default function CreateCustomer() {
   // hooks
@@ -12,64 +18,85 @@ export default function CreateCustomer() {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<CustomerDataType>({
     defaultValues: {
-      type: 'PJ',
+      type: 'PF',
     },
     resolver: zodResolver(CustomerSchema),
   })
   // state
-  const [isCompany, setIsCompany] = useState(true)
+  const [customerType, setCustomerType] = useState('PF')
 
-  const createUser = (customer: CustomerDataType) => {
-    fetch('/clientes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(customer)
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Erro ao criar cliente')
-        }
-
-        reset();
-      })
-      .catch((error) => {
-        console.error('Erro ao criar cliente:', error)
-      })
+  const handleCustomerTypeChange = (value: 'PF' | 'PJ') => {
+    reset()
+    setCustomerType(value)
+    setValue('type', value)
   }
 
-  const onSubmit = (data: CustomerDataType) => createUser(data)
+  const handleCreateCustomer = async (customer: CustomerDataType) => {
+    try {
+      const response = await fetch('/clientes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(customer),
+      })
+
+      if (response.ok) {
+        console.log('Cliente criado com sucesso!')
+      } else if (response.status === 400) {
+        const errorData = await response.json()
+        throw new Error(`${errorData.message}`)
+      } else {
+        throw new Error(`${response.status} ${response.statusText}`)
+      }
+    } catch (error: any) {
+      console.error(error.message)
+      throw error
+    }
+  }
+
+  const onSubmit = (data: CustomerDataType) => handleCreateCustomer(data)
 
   return (
     <Container maxWidth="md" sx={{ mt: 6 }}>
-      {errors.type && <span>{errors.type.message}</span>}
-      {errors.name && <span>{errors.name.message}</span>}
-      {errors.cpf && <span>{errors.cpf.message}</span>}
-      {errors.email && <span>{errors.email.message}</span>}
-      {errors.phone && <span>{errors.phone.message}</span>}
-      {errors.fantasy_name && <span>{errors.fantasy_name.message}</span>}
-
       <Typography variant="h5" mb={3}>
         Cadastrar novo cliente
       </Typography>
 
-      <Menu />
+      <CustomerTypeMenu
+        options={menuOptions}
+        selectedOption={customerType}
+        onChange={handleCustomerTypeChange}
+      />
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={3} mb={3}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              id="cnpj"
-              label="CNPJ"
-              error={!!errors.cnpj}
-              {...register('cnpj', { required: true })}
-              helperText={errors.cnpj && 'CNPJ é obrigatório'}
-            />
-          </Grid>
+          {customerType === 'PJ' ? (
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                id="cnpj"
+                label="CNPJ"
+                error={!!errors.cnpj}
+                {...register('cnpj', { required: true })}
+                helperText={errors.cnpj && 'CNPJ é obrigatório'}
+              />
+            </Grid>
+          ) : (
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                id="cpf"
+                label="CPF"
+                error={!!errors.cpf}
+                {...register('cpf', { required: true })}
+                helperText={errors.cpf && 'CPF é obrigatório'}
+              />
+            </Grid>
+          )}
 
           <Grid item xs={12}>
             <TextField
@@ -78,11 +105,13 @@ export default function CreateCustomer() {
               error={!!errors.name}
               {...register('name', { required: true })}
               helperText={errors.name && 'Nome é obrigatório'}
-              label={isCompany ? 'Nome da empresa' : 'Nome completo'}
+              label={
+                customerType === 'PJ' ? 'Nome da empresa' : 'Nome completo'
+              }
             />
           </Grid>
 
-          {isCompany && (
+          {customerType === 'PJ' && (
             <Grid item xs={12}>
               <TextField
                 fullWidth
