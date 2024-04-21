@@ -12,7 +12,7 @@ export const handlers = [
     const id = Date.now().toString()
     const customer = await request.json()
     storage.set(id, customer)
-    return HttpResponse.json({ id: 1 })
+    return HttpResponse.json({}, { status: 201 })
   }),
 
   http.put('/clientes/:id', async ({ params, request }) => {
