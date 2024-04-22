@@ -38,12 +38,12 @@ export default function CreateCustomer() {
 
   const customerType = watch('type')
 
-  const handleCustomerTypeChange = (value: 'PF' | 'PJ') => {
+  function handleCustomerTypeChange(value: 'PF' | 'PJ') {
     reset()
     setValue('type', value)
   }
 
-  const handleCreateCustomer = async (customer: CustomerDataType) => {
+  async function handleCreateCustomer(customer: CustomerDataType) {
     try {
       const response = await fetch('/clientes', {
         method: 'POST',
@@ -67,11 +67,13 @@ export default function CreateCustomer() {
     }
   }
 
-  const handleGoBack = () => {
+  function handleGoBack() {
     navigate(-1)
   }
 
-  const onSubmit = (data: CustomerDataType) => handleCreateCustomer(data)
+  function onSubmit(data: CustomerDataType) {
+    handleCreateCustomer(data)
+  }
 
   useEffect(() => {
     console.log(errors)

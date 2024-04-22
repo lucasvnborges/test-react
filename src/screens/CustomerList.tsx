@@ -42,7 +42,7 @@ export default function CustomerList() {
   // state
   const [customers, setCustomers] = useState<CustomerDataType[]>([])
 
-  const getCustomers = async () => {
+  async function getCustomers() {
     try {
       const response = await fetch('/clientes')
       const data = await response.json()
