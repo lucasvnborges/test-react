@@ -4,7 +4,7 @@ const IndividualSchema = z.object({
   type: z.literal('PF'),
   name: z
     .string()
-    .min(5, { message: 'O nome completo precisa ser preenchido' }),
+    .min(5, { message: 'Preencha com um nome completo válido' }),
   cpf: z
     .string()
     .length(14, { message: 'Preencha com um número de CPF válido' }),
