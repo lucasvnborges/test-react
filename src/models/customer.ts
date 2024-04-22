@@ -1,13 +1,40 @@
 import { z } from 'zod'
 
-export const CustomerSchema = z.object({
-  type: z.literal('PF').or(z.literal('PJ')),
-  name: z.string(),
-  cpf: z.string().optional(),
-  fantasy_name: z.string().optional(),
-  cnpj: z.string().optional(),
-  email: z.string(),
-  phone: z.string(),
+const IndividualSchema = z.object({
+  type: z.literal('PF'),
+  name: z
+    .string()
+    .min(5, { message: 'O nome completo precisa ser preenchido' }),
+  cpf: z.string().length(14, { message: 'Preencha com um número de CPF válido' }),
+  email: z.string().email("Preencha com um e-mail válido"),
+  phone: z.string().refine(
+    (value) => {
+      const phoneRegex = /^\(?\d{2}\)?\s?9\d{4}-?\d{4}$/
+      return phoneRegex.test(value)
+    },
+    {
+      message: 'Preencha com um número de telefone válido',
+    }
+  ),
 })
+
+const CorporateSchema = z.object({
+  type: z.literal('PJ'),
+  name: z.string(),
+  fantasy_name: z.string(),
+  cnpj: z.string().length(18),
+  email: z.string().email(),
+  phone: z
+    .string()
+    .regex(/^\(?\d{2}\)?\s?9\d{4}-?\d{4}$/)
+    .refine((value) => /^\(?\d{2}\)?\s?9/.test(value), {
+      message: 'Preencha com um número de telefone válido',
+    }),
+})
+
+export const CustomerSchema = z.discriminatedUnion('type', [
+  IndividualSchema,
+  CorporateSchema,
+])
 
 export type CustomerDataType = z.infer<typeof CustomerSchema>
