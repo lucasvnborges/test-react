@@ -1,10 +1,18 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CustomerDataType, CustomerSchema } from 'src/models/customer'
-import { Button, Container, Grid, TextField, Typography } from '@mui/material'
+import {
+  Button,
+  Container,
+  Grid,
+  IconButton,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { Business, Person } from '@mui/icons-material'
 import { CustomerTypeMenu } from 'src/components'
+import { ArrowBack } from '@mui/icons-material'
 
 const menuOptions = [
   { value: 'PF', label: 'Pessoa Física', icon: <Person /> },
@@ -12,25 +20,24 @@ const menuOptions = [
 ]
 
 export default function CreateCustomer() {
-  // hooks
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
     setValue,
+    watch,
   } = useForm<CustomerDataType>({
+    resolver: zodResolver(CustomerSchema),
     defaultValues: {
       type: 'PF',
     },
-    resolver: zodResolver(CustomerSchema),
   })
-  // state
-  const [customerType, setCustomerType] = useState('PF')
+
+  const customerType = watch('type')
 
   const handleCustomerTypeChange = (value: 'PF' | 'PJ') => {
     reset()
-    setCustomerType(value)
     setValue('type', value)
   }
 
@@ -60,11 +67,20 @@ export default function CreateCustomer() {
 
   const onSubmit = (data: CustomerDataType) => handleCreateCustomer(data)
 
+  useEffect(() => {
+    console.log(errors)
+  }, [errors])
+
   return (
     <Container maxWidth="md" sx={{ mt: 6 }}>
-      <Typography variant="h5" mb={3}>
-        Cadastrar novo cliente
-      </Typography>
+      <Grid display="flex" alignItems="center" flexDirection="row" mb={3}>
+        <IconButton>
+          <ArrowBack />
+        </IconButton>
+        <Typography variant="h6" ml={1}>
+          Cadastrar novo cliente
+        </Typography>
+      </Grid>
 
       <CustomerTypeMenu
         options={menuOptions}
@@ -80,9 +96,9 @@ export default function CreateCustomer() {
                 fullWidth
                 id="cnpj"
                 label="CNPJ"
-                error={!!errors.cnpj}
+                error={'cnpj' in errors && !!errors.cnpj}
                 {...register('cnpj', { required: true })}
-                helperText={errors.cnpj && 'CNPJ é obrigatório'}
+                helperText={'cnpj' in errors && errors.cnpj?.message}
               />
             </Grid>
           ) : (
@@ -91,9 +107,9 @@ export default function CreateCustomer() {
                 fullWidth
                 id="cpf"
                 label="CPF"
-                error={!!errors.cpf}
+                error={'cpf' in errors && !!errors.cpf}
                 {...register('cpf', { required: true })}
-                helperText={errors.cpf && 'CPF é obrigatório'}
+                helperText={'cpf' in errors && errors.cpf?.message}
               />
             </Grid>
           )}
@@ -103,8 +119,8 @@ export default function CreateCustomer() {
               fullWidth
               id="name"
               error={!!errors.name}
+              helperText={errors.name?.message}
               {...register('name', { required: true })}
-              helperText={errors.name && 'Nome é obrigatório'}
               label={
                 customerType === 'PJ' ? 'Nome da empresa' : 'Nome completo'
               }
@@ -117,10 +133,10 @@ export default function CreateCustomer() {
                 fullWidth
                 id="fantasy_name"
                 label="Nome fantasia"
-                error={!!errors.fantasy_name}
                 {...register('fantasy_name', { required: true })}
+                error={'fantasy_name' in errors && !!errors.fantasy_name}
                 helperText={
-                  errors.fantasy_name && 'Nome fantasia é obrigatório'
+                  'fantasy_name' in errors && errors.fantasy_name?.message
                 }
               />
             </Grid>
@@ -132,8 +148,8 @@ export default function CreateCustomer() {
               id="email"
               label="E-mail"
               error={!!errors.email}
+              helperText={errors.email?.message}
               {...register('email', { required: true })}
-              helperText={errors.email && 'E-mail é obrigatório'}
             />
           </Grid>
 
@@ -143,13 +159,13 @@ export default function CreateCustomer() {
               id="phone"
               label="Telefone"
               error={!!errors.phone}
+              helperText={errors.phone?.message}
               {...register('phone', { required: true })}
-              helperText={errors.phone && 'Telefone é obrigatório'}
             />
           </Grid>
         </Grid>
 
-        <Button type="submit" variant="contained">
+        <Button type="submit" variant="contained" sx={{ float: 'right' }}>
           Salvar
         </Button>
       </form>
