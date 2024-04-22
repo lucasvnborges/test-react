@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CustomerDataType, CustomerSchema } from 'src/models/customer'
 import {
@@ -20,6 +21,7 @@ const menuOptions = [
 ]
 
 export default function CreateCustomer() {
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -65,6 +67,10 @@ export default function CreateCustomer() {
     }
   }
 
+  const handleGoBack = () => {
+    navigate(-1)
+  }
+
   const onSubmit = (data: CustomerDataType) => handleCreateCustomer(data)
 
   useEffect(() => {
@@ -74,7 +80,7 @@ export default function CreateCustomer() {
   return (
     <Container maxWidth="md" sx={{ mt: 6 }}>
       <Grid display="flex" alignItems="center" flexDirection="row" mb={3}>
-        <IconButton>
+        <IconButton onClick={handleGoBack}>
           <ArrowBack />
         </IconButton>
         <Typography variant="h6" ml={1}>
