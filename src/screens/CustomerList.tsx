@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { CustomerDataType } from 'src/models/customer'
 import {
   Container,
@@ -18,6 +19,7 @@ import {
   TableRow,
   Stack,
   Grid,
+  Typography,
 } from '@mui/material'
 import { Search, Edit, Delete } from '@mui/icons-material'
 
@@ -35,29 +37,39 @@ const NameColumn = styled(TableCell)`
 `
 
 export default function CustomerList() {
-  const [data, setData] = useState<CustomerDataType[]>()
+  // hooks
+  const navigate = useNavigate()
+  // state
+  const [customers, setCustomers] = useState<CustomerDataType[]>([])
+
+  const getCustomers = async () => {
+    try {
+      const response = await fetch('/clientes')
+      const data = await response.json()
+
+      if (response.ok) {
+        setCustomers(data)
+      } else if (response.status === 400) {
+        const errorData = await response.json()
+        throw new Error(`${errorData.message}`)
+      } else {
+        throw new Error(`${response.status} ${response.statusText}`)
+      }
+    } catch (error: any) {
+      console.error(error.message)
+      throw error
+    }
+  }
 
   useEffect(() => {
-    fetch('/clientes')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Erro ao buscar clientes')
-        }
-        return response.json()
-      })
-      .then((data) => {
-        setData(data)
-      })
-      .catch((error) => {
-        console.error('Erro ao buscar clientes:', error)
-      })
+    getCustomers()
   }, [])
 
   return (
-    <Container maxWidth="md" sx={{ mt: 6 }}>
-      <Grid item xs={12}>
+    <Container maxWidth="md">
+      <Grid item xs={12} mt={6} mb={6}>
         <Box display="flex" flexDirection="row" alignItems="center">
-          <FormControl sx={{ mr: 1, flex: 1 }} variant="outlined">
+          <FormControl fullWidth variant="outlined" sx={{ mr: 1 }}>
             <OutlinedInput
               type="text"
               id="input-buscar-clientes"
@@ -84,8 +96,23 @@ export default function CustomerList() {
         </Box>
       </Grid>
 
+      <Grid item xs={12} mb={3}>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography variant="h6">Lista de clientes cadastrados</Typography>
+
+          <Button
+            color="primary"
+            variant="outlined"
+            aria-label="Buscar cliente"
+            onClick={() => navigate('/novo-cliente')}
+          >
+            Adicionar novo cliente
+          </Button>
+        </Box>
+      </Grid>
+
       <Grid item xs={12}>
-        <TableContainer component={Paper} sx={{ mt: 3 }}>
+        <TableContainer component={Paper}>
           <Table aria-label="Lista de clientes">
             <TableHead>
               <TableRow>
@@ -100,15 +127,17 @@ export default function CustomerList() {
             </TableHead>
 
             <TableBody>
-              {data &&
-                data.map((row, index) => (
+              {customers.length > 0 &&
+                customers.map((row, index) => (
                   <TableRow key={row.name + index}>
                     <TableCell sx={{ textAlign: 'center' }}>
                       {row.type}
                     </TableCell>
                     <TableCell sx={{ minWidth: '180px' }}>{row.name}</TableCell>
                     <TableCell sx={{ minWidth: '180px' }}>
-                      {row.fantasy_name && row.type === 'PJ'
+                      {'fantasy_name' in row &&
+                      row.fantasy_name &&
+                      row.type === 'PJ'
                         ? row.fantasy_name
                         : '-'}
                     </TableCell>
