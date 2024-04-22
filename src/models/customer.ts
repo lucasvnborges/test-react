@@ -5,8 +5,10 @@ const IndividualSchema = z.object({
   name: z
     .string()
     .min(5, { message: 'O nome completo precisa ser preenchido' }),
-  cpf: z.string().length(14, { message: 'Preencha com um número de CPF válido' }),
-  email: z.string().email("Preencha com um e-mail válido"),
+  cpf: z
+    .string()
+    .length(14, { message: 'Preencha com um número de CPF válido' }),
+  email: z.string().email('Preencha com um e-mail válido'),
   phone: z.string().refine(
     (value) => {
       const phoneRegex = /^\(?\d{2}\)?\s?9\d{4}-?\d{4}$/
@@ -32,9 +34,6 @@ const CorporateSchema = z.object({
     }),
 })
 
-export const CustomerSchema = z.discriminatedUnion('type', [
-  IndividualSchema,
-  CorporateSchema,
-])
+export const CustomerSchema = z.union([IndividualSchema, CorporateSchema])
 
 export type CustomerDataType = z.infer<typeof CustomerSchema>
