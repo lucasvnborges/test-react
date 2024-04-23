@@ -1,11 +1,11 @@
 import styled from 'styled-components'
-import { Grid, Typography } from '@mui/material'
+import { Box, Grid, Typography } from '@mui/material'
 
-interface MenuItemProps {
+type ItemProps = {
   selected?: boolean
 }
 
-interface MenuProps {
+type Props = {
   options: {
     value: string
     label: string
@@ -15,7 +15,7 @@ interface MenuProps {
   onChange: (value: any) => void
 }
 
-const MenuItem = styled(Grid)<MenuItemProps>`
+const MenuItem = styled(Grid)<ItemProps>`
   display: flex;
   cursor: pointer;
   align-items: center;
@@ -26,11 +26,7 @@ const MenuItem = styled(Grid)<MenuItemProps>`
   background-color: ${({ selected }) => (selected ? '#f1f1f1' : '#ffffff')};
 `
 
-const IconWrapper = styled.div`
-  margin-right: 6px;
-`
-
-export default function Menu({ options, selectedOption, onChange }: MenuProps) {
+export default function Menu({ options, selectedOption, onChange }: Props) {
   return (
     <Grid container spacing={3} mb={3}>
       {options.map((option) => (
@@ -39,7 +35,7 @@ export default function Menu({ options, selectedOption, onChange }: MenuProps) {
             onClick={() => onChange(option.value)}
             selected={option.value === selectedOption}
           >
-            <IconWrapper>{option.icon}</IconWrapper>
+            <Box mr={1}>{option.icon}</Box>
             <Typography>{option.label}</Typography>
           </MenuItem>
         </Grid>
