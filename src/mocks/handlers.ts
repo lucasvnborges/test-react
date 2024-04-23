@@ -11,8 +11,17 @@ export const handlers = [
   http.post('/clientes', async ({ request }) => {
     const id = Date.now().toString()
     const customer = await request.json()
-    storage.set(id, customer)
-    return HttpResponse.json({}, { status: 201 })
+
+    if (customer && typeof customer === 'object' && !Array.isArray(customer)) {
+      customer.id = id
+      storage.set(id, customer)
+      return HttpResponse.json({}, { status: 201 })
+    } else {
+      return HttpResponse.json(
+        { error: 'Invalid customer data' },
+        { status: 400 }
+      )
+    }
   }),
 
   http.put('/clientes/:id', async ({ params, request }) => {
