@@ -1,2 +1,5 @@
 export { default as CustomerTypeMenu } from './CustomerTypeMenu'
 export { default as InputMaskCustom } from './InputMaskCustom'
+export { default as AlertDialog } from './AlertDialog'
+export { default as CustomerForm } from './CustomerForm'
+export { default as Notification } from './Notification'
