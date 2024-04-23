@@ -1,12 +1,15 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CustomerDataType, CustomerSchema } from 'src/models/customer'
 import {
+  Alert,
   Button,
   Container,
   Grid,
   IconButton,
+  Snackbar,
   TextField,
   Typography,
 } from '@mui/material'
@@ -36,6 +39,12 @@ export default function CreateCustomer() {
       type: 'PF',
     },
   })
+  // state
+  const [alert, setAlert] = useState<any>({
+    visible: false,
+    status: '',
+    message: '',
+  })
 
   const customerType = watch('type')
 
@@ -55,9 +64,19 @@ export default function CreateCustomer() {
       })
 
       if (response.ok) {
+        setAlert({
+          visible: true,
+          status: 'success',
+          message: 'Novo cliente criado com sucesso!',
+        })
         reset()
       }
     } catch (error: any) {
+      setAlert({
+        visible: true,
+        status: 'error',
+        message: 'Ocorreu um erro interno ao cadastrar o novo cliente!',
+      })
       throw error
     }
   }
@@ -66,12 +85,35 @@ export default function CreateCustomer() {
     navigate(-1)
   }
 
+  function handleCloseAlert() {
+    setAlert({
+      visible: false,
+      status: '',
+      message: '',
+    })
+  }
+
   function onSubmit(data: CustomerDataType) {
     handleCreateCustomer(data)
   }
 
   return (
     <Container maxWidth="md" sx={{ mt: 6 }}>
+      <Snackbar
+        open={alert.visible}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          variant="filled"
+          severity={alert.status}
+          onClose={handleCloseAlert}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
+
       <Grid display="flex" alignItems="center" flexDirection="row" mb={3}>
         <IconButton onClick={handleGoBack}>
           <ArrowBack />
