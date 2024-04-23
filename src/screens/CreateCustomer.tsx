@@ -1,30 +1,16 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Business, Person, ArrowBack } from '@mui/icons-material'
+import { Container, Grid, IconButton, Typography } from '@mui/material'
 import { CustomerDataType, CustomerSchema } from 'src/models/customer'
-import {
-  Alert,
-  Button,
-  Container,
-  Grid,
-  IconButton,
-  Snackbar,
-  TextField,
-  Typography,
-} from '@mui/material'
-import { Business, Person } from '@mui/icons-material'
-import { CustomerTypeMenu } from 'src/components'
-import { ArrowBack } from '@mui/icons-material'
-import { InputMaskCustom } from 'src/components'
-
-const menuOptions = [
-  { value: 'PF', label: 'Pessoa Física', icon: <Person /> },
-  { value: 'PJ', label: 'Pessoa Jurídica', icon: <Business /> },
-]
+import { CustomerForm, CustomerTypeMenu, Notification } from 'src/components'
+import { NotificationStatus } from 'src/components/Notification'
+import { createCustomer } from 'src/services/customerService'
 
 export default function CreateCustomer() {
-  // hooks
   const navigate = useNavigate()
   const {
     register,
@@ -39,10 +25,13 @@ export default function CreateCustomer() {
       type: 'PF',
     },
   })
-  // state
-  const [alert, setAlert] = useState<any>({
+
+  const [notification, setNotification] = useState<{
+    message: string
+    visible: boolean
+    status?: NotificationStatus
+  }>({
     visible: false,
-    status: '',
     message: '',
   })
 
@@ -53,66 +42,48 @@ export default function CreateCustomer() {
     setValue('type', value)
   }
 
-  async function handleCreateCustomer(customer: CustomerDataType) {
-    try {
-      const response = await fetch('/clientes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(customer),
-      })
-
-      if (response.ok) {
-        setAlert({
-          visible: true,
-          status: 'success',
-          message: 'Novo cliente criado com sucesso!',
-        })
-        reset()
-      }
-    } catch (error: any) {
-      setAlert({
+  const { mutate } = useMutation({
+    mutationKey: ['customers'],
+    mutationFn: createCustomer,
+    onError: () => {
+      setNotification({
         visible: true,
         status: 'error',
         message: 'Ocorreu um erro interno ao cadastrar o novo cliente!',
       })
-      throw error
-    }
-  }
+    },
+    onSuccess: () => {
+      setNotification({
+        visible: true,
+        status: 'success',
+        message: 'Novo cliente criado com sucesso!',
+      })
+      reset()
+      setValue('type', customerType)
+    },
+  })
 
   function handleGoBack() {
     navigate(-1)
   }
 
-  function handleCloseAlert() {
-    setAlert({
+  function handleCloseNotification() {
+    setNotification({
       visible: false,
-      status: '',
       message: '',
     })
   }
 
   function onSubmit(data: CustomerDataType) {
-    handleCreateCustomer(data)
+    mutate(data)
   }
 
   return (
     <Container maxWidth="md" sx={{ mt: 6 }}>
-      <Snackbar
-        open={alert.visible}
-        autoHideDuration={6000}
-        onClose={handleCloseAlert}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert
-          variant="filled"
-          severity={alert.status}
-          onClose={handleCloseAlert}
-        >
-          {alert.message}
-        </Alert>
-      </Snackbar>
+      <Notification
+        notification={notification}
+        onClose={handleCloseNotification}
+      />
 
       <Grid display="flex" alignItems="center" flexDirection="row" mb={3}>
         <IconButton onClick={handleGoBack}>
@@ -124,102 +95,21 @@ export default function CreateCustomer() {
       </Grid>
 
       <CustomerTypeMenu
-        options={menuOptions}
+        options={[
+          { value: 'PF', label: 'Pessoa Física', icon: <Person /> },
+          { value: 'PJ', label: 'Pessoa Jurídica', icon: <Business /> },
+        ]}
         selectedOption={customerType}
         onChange={handleCustomerTypeChange}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={3} mb={3}>
-          {customerType === 'PJ' ? (
-            <Grid item xs={12} key={`${customerType}-cnpj`}>
-              <TextField
-                {...register('cnpj')}
-                fullWidth
-                id="cnpj"
-                label="CNPJ"
-                error={'cnpj' in errors && !!errors.cnpj}
-                helperText={'cnpj' in errors && errors.cnpj?.message}
-                InputProps={{
-                  inputComponent: InputMaskCustom as any,
-                  inputProps: {
-                    mask: '00.000.000/0000-00',
-                  },
-                }}
-              />
-            </Grid>
-          ) : (
-            <Grid item xs={12} key={`${customerType}-cpf`}>
-              <TextField
-                {...register('cpf')}
-                fullWidth
-                id="cpf"
-                label="CPF"
-                error={'cpf' in errors && !!errors.cpf}
-                helperText={'cpf' in errors && errors.cpf?.message}
-                InputProps={{
-                  inputComponent: InputMaskCustom as any,
-                  inputProps: {
-                    mask: '000.000.000-00',
-                  },
-                }}
-              />
-            </Grid>
-          )}
-
-          <Grid item xs={12} key={`${customerType}-name`}>
-            <TextField
-              {...register('name')}
-              fullWidth
-              id="name"
-              error={!!errors.name}
-              helperText={errors.name?.message}
-              label={customerType === 'PJ' ? 'Razão social' : 'Nome completo'}
-            />
-          </Grid>
-
-          {customerType === 'PJ' && (
-            <Grid item xs={12} key={`${customerType}-fantasy_name`}>
-              <TextField
-                {...register('fantasy_name')}
-                fullWidth
-                id="fantasy_name"
-                label="Nome fantasia"
-                error={'fantasy_name' in errors && !!errors.fantasy_name}
-                helperText={
-                  'fantasy_name' in errors && errors.fantasy_name?.message
-                }
-              />
-            </Grid>
-          )}
-
-          <Grid item xs={12} sm={6} key={`${customerType}-email`}>
-            <TextField
-              {...register('email')}
-              fullWidth
-              id="email"
-              label="E-mail"
-              error={!!errors.email}
-              helperText={errors.email?.message}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6} key={`${customerType}-phone`}>
-            <TextField
-              {...register('phone')}
-              fullWidth
-              id="phone"
-              label="Telefone"
-              error={!!errors.phone}
-              helperText={errors.phone?.message}
-            />
-          </Grid>
-        </Grid>
-
-        <Button type="submit" variant="contained" sx={{ float: 'right' }}>
-          Salvar
-        </Button>
-      </form>
+      <CustomerForm
+        errors={errors}
+        register={register}
+        onSubmit={onSubmit}
+        handleSubmit={handleSubmit}
+        customerType={customerType}
+      />
     </Container>
   )
 }
