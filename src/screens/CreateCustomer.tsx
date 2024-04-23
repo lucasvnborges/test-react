@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,6 +13,7 @@ import {
 import { Business, Person } from '@mui/icons-material'
 import { CustomerTypeMenu } from 'src/components'
 import { ArrowBack } from '@mui/icons-material'
+import { InputMaskCustom } from 'src/components'
 
 const menuOptions = [
   { value: 'PF', label: 'Pessoa Física', icon: <Person /> },
@@ -21,6 +21,7 @@ const menuOptions = [
 ]
 
 export default function CreateCustomer() {
+  // hooks
   const navigate = useNavigate()
   const {
     register,
@@ -54,15 +55,9 @@ export default function CreateCustomer() {
       })
 
       if (response.ok) {
-        console.log('Cliente criado com sucesso!')
-      } else if (response.status === 400) {
-        const errorData = await response.json()
-        throw new Error(`${errorData.message}`)
-      } else {
-        throw new Error(`${response.status} ${response.statusText}`)
+        reset()
       }
     } catch (error: any) {
-      console.error(error.message)
       throw error
     }
   }
@@ -74,10 +69,6 @@ export default function CreateCustomer() {
   function onSubmit(data: CustomerDataType) {
     handleCreateCustomer(data)
   }
-
-  useEffect(() => {
-    console.log(errors)
-  }, [errors])
 
   return (
     <Container maxWidth="md" sx={{ mt: 6 }}>
@@ -99,49 +90,59 @@ export default function CreateCustomer() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={3} mb={3}>
           {customerType === 'PJ' ? (
-            <Grid item xs={12}>
+            <Grid item xs={12} key={`${customerType}-cnpj`}>
               <TextField
+                {...register('cnpj')}
                 fullWidth
                 id="cnpj"
                 label="CNPJ"
                 error={'cnpj' in errors && !!errors.cnpj}
-                {...register('cnpj', { required: true })}
                 helperText={'cnpj' in errors && errors.cnpj?.message}
+                InputProps={{
+                  inputComponent: InputMaskCustom as any,
+                  inputProps: {
+                    mask: '00.000.000/0000-00',
+                  },
+                }}
               />
             </Grid>
           ) : (
-            <Grid item xs={12}>
+            <Grid item xs={12} key={`${customerType}-cpf`}>
               <TextField
+                {...register('cpf')}
                 fullWidth
                 id="cpf"
                 label="CPF"
                 error={'cpf' in errors && !!errors.cpf}
-                {...register('cpf', { required: true })}
                 helperText={'cpf' in errors && errors.cpf?.message}
+                InputProps={{
+                  inputComponent: InputMaskCustom as any,
+                  inputProps: {
+                    mask: '000.000.000-00',
+                  },
+                }}
               />
             </Grid>
           )}
 
-          <Grid item xs={12}>
+          <Grid item xs={12} key={`${customerType}-name`}>
             <TextField
+              {...register('name')}
               fullWidth
               id="name"
               error={!!errors.name}
               helperText={errors.name?.message}
-              {...register('name', { required: true })}
-              label={
-                customerType === 'PJ' ? 'Nome da empresa' : 'Nome completo'
-              }
+              label={customerType === 'PJ' ? 'Razão social' : 'Nome completo'}
             />
           </Grid>
 
           {customerType === 'PJ' && (
-            <Grid item xs={12}>
+            <Grid item xs={12} key={`${customerType}-fantasy_name`}>
               <TextField
+                {...register('fantasy_name')}
                 fullWidth
                 id="fantasy_name"
                 label="Nome fantasia"
-                {...register('fantasy_name', { required: true })}
                 error={'fantasy_name' in errors && !!errors.fantasy_name}
                 helperText={
                   'fantasy_name' in errors && errors.fantasy_name?.message
@@ -150,25 +151,25 @@ export default function CreateCustomer() {
             </Grid>
           )}
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} key={`${customerType}-email`}>
             <TextField
+              {...register('email')}
               fullWidth
               id="email"
               label="E-mail"
               error={!!errors.email}
               helperText={errors.email?.message}
-              {...register('email', { required: true })}
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} key={`${customerType}-phone`}>
             <TextField
+              {...register('phone')}
               fullWidth
               id="phone"
               label="Telefone"
               error={!!errors.phone}
               helperText={errors.phone?.message}
-              {...register('phone', { required: true })}
             />
           </Grid>
         </Grid>
