@@ -9,7 +9,7 @@ const BaseSchema = z.object({
   }),
 })
 
-const IndividualSchema = BaseSchema.extend({
+export const IndividualSchema = BaseSchema.extend({
   type: z.literal('PF'),
   name: z.string().min(5, { message: 'Preencha com um nome completo válido' }),
   cpf: z.string().refine(
@@ -23,7 +23,7 @@ const IndividualSchema = BaseSchema.extend({
   ),
 })
 
-const CorporateSchema = BaseSchema.extend({
+export const CorporateSchema = BaseSchema.extend({
   type: z.literal('PJ'),
   name: z.string().min(5, { message: 'Preencha com uma razão social válida' }),
   fantasy_name: z
@@ -42,7 +42,7 @@ const CorporateSchema = BaseSchema.extend({
 
 export const CustomerSchema = z.union([IndividualSchema, CorporateSchema])
 
-type CustomerSchemaDataType = z.infer<typeof CustomerSchema>
+export type CustomerSchemaDataType = z.infer<typeof CustomerSchema>
 
 type AdditionalProps = {
   id: string
