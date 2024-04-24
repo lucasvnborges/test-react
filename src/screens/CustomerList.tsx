@@ -61,7 +61,7 @@ export default function CustomerList() {
         onConfirm={handleDeleteCustomer}
       />
 
-      <Grid item xs={12} mb={3}>
+      <Grid item xs={12} mb={3} mt={6}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Typography variant="h6">Lista de clientes cadastrados</Typography>
 
