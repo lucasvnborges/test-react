@@ -45,14 +45,14 @@ export default function CreateCustomer() {
       setNotification({
         visible: true,
         status: 'error',
-        message: 'Ocorreu um erro interno ao cadastrar o novo cliente!',
+        message: 'Ocorreu um erro interno ao cadastrar o cliente',
       })
     },
     onSuccess: () => {
       setNotification({
         visible: true,
         status: 'success',
-        message: 'Novo cliente cadastrado com sucesso!',
+        message: 'Cliente cadastrado com sucesso',
       })
       reset()
       setValue('type', customerType)
@@ -86,7 +86,7 @@ export default function CreateCustomer() {
           <ArrowBack />
         </IconButton>
         <Typography variant="h6" ml={1}>
-          Cadastrar novo cliente
+          Cadastrar cliente
         </Typography>
       </Grid>
 

@@ -56,14 +56,14 @@ export default function EditCustomer() {
       setNotification({
         visible: true,
         status: 'error',
-        message: 'Ocorreu um erro interno ao atualizar o cliente!',
+        message: 'Ocorreu um erro interno ao atualizar o cliente',
       })
     },
     onSuccess: () => {
       setNotification({
         visible: true,
         status: 'success',
-        message: 'Cliente atualizado com sucesso!',
+        message: 'Cliente atualizado com sucesso',
       })
     },
   })
