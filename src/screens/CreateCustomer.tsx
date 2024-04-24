@@ -7,7 +7,7 @@ import { Business, Person, ArrowBack } from '@mui/icons-material'
 import { Container, Grid, IconButton, Typography } from '@mui/material'
 import { CustomerDataType, CustomerSchema } from 'src/models/customer'
 import { CustomerForm, CustomerTypeMenu, Notification } from 'src/components'
-import { NotificationStatus } from 'src/components/Notification'
+import { NotificationType } from 'src/components/Notification'
 import { createCustomer } from 'src/services/customerService'
 
 export default function CreateCustomer() {
@@ -26,11 +26,7 @@ export default function CreateCustomer() {
     },
   })
 
-  const [notification, setNotification] = useState<{
-    message: string
-    visible: boolean
-    status?: NotificationStatus
-  }>({
+  const [notification, setNotification] = useState<NotificationType>({
     visible: false,
     message: '',
   })
@@ -56,7 +52,7 @@ export default function CreateCustomer() {
       setNotification({
         visible: true,
         status: 'success',
-        message: 'Novo cliente criado com sucesso!',
+        message: 'Novo cliente cadastrado com sucesso!',
       })
       reset()
       setValue('type', customerType)
@@ -95,12 +91,12 @@ export default function CreateCustomer() {
       </Grid>
 
       <CustomerTypeMenu
+        selectedOption={customerType}
+        onChange={handleCustomerTypeChange}
         options={[
           { value: 'PF', label: 'Pessoa Física', icon: <Person /> },
           { value: 'PJ', label: 'Pessoa Jurídica', icon: <Business /> },
         ]}
-        selectedOption={customerType}
-        onChange={handleCustomerTypeChange}
       />
 
       <CustomerForm
