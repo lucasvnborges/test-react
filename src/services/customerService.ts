@@ -39,7 +39,6 @@ export const getCustomerById = async (id: string) => {
 }
 
 export const updateCustomer = async (customer: CustomerDataType) => {
-  console.log(customer)
   const response = await fetch(`/clientes/${customer.id}`, {
     method: 'PUT',
     headers: {
