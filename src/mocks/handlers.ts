@@ -24,16 +24,22 @@ export const handlers = [
     }
   }),
 
+  http.get('/clientes/:id', async ({ params }) => {
+    const { id } = params
+    const customer = storage.get(id.toString())
+    return HttpResponse.json(customer)
+  }),
+
   http.put('/clientes/:id', async ({ params, request }) => {
-    // const { id } = params
-    // const customer = await request.json()
-    // storage.set(id.toString(), customer)
-    // return HttpResponse.json(customer)
+    const { id } = params
+    const customer = await request.json()
+    storage.set(id.toString(), customer)
+    return HttpResponse.json(customer)
   }),
 
   http.delete('/clientes/:id', ({ params }) => {
     const { id } = params
     storage.delete(id.toString())
-    return new HttpResponse('Success', { status: 200 })
+    return HttpResponse.json({}, { status: 200 })
   }),
 ]
