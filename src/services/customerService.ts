@@ -1,4 +1,4 @@
-import { CustomerDataType } from 'src/models/customer'
+import { CustomerDataType, CustomerSchemaDataType } from 'src/models/customer'
 
 export const fetchCustomers = async () => {
   const response = await fetch('/clientes')
@@ -10,7 +10,7 @@ export const fetchCustomers = async () => {
   return response.json()
 }
 
-export const createCustomer = async (customer: CustomerDataType) => {
+export const createCustomer = async (customer: CustomerSchemaDataType) => {
   const response = await fetch('/clientes', {
     method: 'POST',
     headers: {
