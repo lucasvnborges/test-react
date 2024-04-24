@@ -1,4 +1,4 @@
-import { Grid, TextField, Button } from '@mui/material'
+import { Grid, TextField, Button, Typography, CircularProgress } from '@mui/material'
 import { InputMaskCustom } from 'src/components'
 
 export default function CustomerForm({
@@ -7,7 +7,8 @@ export default function CustomerForm({
   register,
   errors,
   handleSubmit,
-  disabled = false
+  disabled = false,
+  loading = false,
 }: any) {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -109,8 +110,17 @@ export default function CustomerForm({
         </Grid>
       </Grid>
 
-      <Button type="submit" variant="contained" sx={{ float: 'right' }} disabled={disabled}>
-        Salvar
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={disabled}
+        sx={{ float: 'right' }}
+      >
+        {loading ? (
+          <CircularProgress size={24} color="inherit" />
+        ) : (
+          <Typography>Salvar</Typography>
+        )}
       </Button>
     </form>
   )

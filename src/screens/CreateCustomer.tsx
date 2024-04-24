@@ -38,7 +38,7 @@ export default function CreateCustomer() {
     setValue('type', value)
   }
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ['customers'],
     mutationFn: createCustomer,
     onError: () => {
@@ -103,6 +103,8 @@ export default function CreateCustomer() {
         errors={errors}
         register={register}
         onSubmit={onSubmit}
+        loading={isPending}
+        disabled={isPending}
         handleSubmit={handleSubmit}
         customerType={customerType}
       />
