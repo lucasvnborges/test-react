@@ -10,7 +10,7 @@ import {
   LinearProgress,
   Alert,
 } from '@mui/material'
-import { AlertDialog, CustomersTable, SearchBar } from 'src/components'
+import { AlertDialog, CustomersTable } from 'src/components'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { deleteCustomer, fetchCustomers } from 'src/services/customerService'
 
@@ -60,8 +60,6 @@ export default function CustomerList() {
         onClose={handleCloseDialog}
         onConfirm={handleDeleteCustomer}
       />
-
-      <SearchBar onSearch={() => console.log('search')} />
 
       <Grid item xs={12} mb={3}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
