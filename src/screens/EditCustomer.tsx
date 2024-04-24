@@ -13,11 +13,7 @@ import { getCustomerById, updateCustomer } from 'src/services/customerService'
 export default function EditCustomer() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const {
-    data: customer,
-    isError,
-    isPending,
-  } = useQuery({
+  const { data: customer } = useQuery({
     queryKey: ['customers', id],
     queryFn: () => !!id && getCustomerById(id),
   })
