@@ -1,100 +1,67 @@
-import styled from 'styled-components'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CustomerDataType } from 'src/models/customer'
 import {
   Container,
   Button,
-  FormControl,
-  OutlinedInput,
-  InputAdornment,
-  IconButton,
   Box,
-  TableContainer,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   Stack,
   Grid,
   Typography,
+  LinearProgress,
+  Alert,
 } from '@mui/material'
-import { Search, Edit, Delete } from '@mui/icons-material'
-
-const CustomCell = styled(TableCell)`
-  right: 0;
-  z-index: 1;
-  height: 64px;
-  position: sticky;
-  position: -webkit-sticky;
-  background-color: rgb(250 250 250 / 80%);
-`
-
-const NameColumn = styled(TableCell)`
-  font-weight: bold;
-`
+import { AlertDialog, CustomersTable, SearchBar } from 'src/components'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { deleteCustomer, fetchCustomers } from 'src/services/customerService'
 
 export default function CustomerList() {
-  // hooks
   const navigate = useNavigate()
-  // state
-  const [customers, setCustomers] = useState<CustomerDataType[]>([])
+  const queryClient = useQueryClient()
+  const { data, isError, isPending } = useQuery({
+    queryKey: ['customers'],
+    queryFn: fetchCustomers,
+  })
 
-  async function getCustomers() {
-    try {
-      const response = await fetch('/clientes')
-      const data = await response.json()
+  const [modal, setModalState] = useState({
+    visible: false,
+    customerId: '',
+  })
 
-      if (response.ok) {
-        setCustomers(data)
-      } else if (response.status === 400) {
-        const errorData = await response.json()
-        throw new Error(`${errorData.message}`)
-      } else {
-        throw new Error(`${response.status} ${response.statusText}`)
-      }
-    } catch (error: any) {
-      console.error(error.message)
-      throw error
-    }
+  function handleOpenDialog(id: string) {
+    setModalState({
+      visible: true,
+      customerId: id,
+    })
   }
 
-  useEffect(() => {
-    getCustomers()
-  }, [])
+  function handleCloseDialog() {
+    setModalState({
+      visible: false,
+      customerId: '',
+    })
+  }
+
+  const { mutate } = useMutation({
+    mutationFn: deleteCustomer,
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] })
+    },
+  })
+
+  const handleDeleteCustomer = () => {
+    mutate(modal.customerId)
+    handleCloseDialog()
+  }
 
   return (
     <Container maxWidth="md">
-      <Grid item xs={12} mt={6} mb={6}>
-        <Box display="flex" flexDirection="row" alignItems="center">
-          <FormControl fullWidth variant="outlined" sx={{ mr: 1 }}>
-            <OutlinedInput
-              type="text"
-              id="input-buscar-clientes"
-              endAdornment={
-                <Box mr={1}>
-                  <InputAdornment position="end">
-                    <IconButton edge="end" aria-label="">
-                      <Search />
-                    </IconButton>
-                  </InputAdornment>
-                </Box>
-              }
-              placeholder="Buscar cliente(s) por Tipo, Nome, Nome Fantasia, Documento, E-mail ou Telefone"
-            />
-          </FormControl>
+      <AlertDialog
+        show={modal.visible}
+        onClose={handleCloseDialog}
+        onConfirm={handleDeleteCustomer}
+      />
 
-          <Button
-            color="primary"
-            variant="contained"
-            aria-label="Buscar cliente"
-          >
-            Buscar
-          </Button>
-        </Box>
-      </Grid>
+      <SearchBar onSearch={() => console.log('search')} />
 
       <Grid item xs={12} mb={3}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -104,7 +71,7 @@ export default function CustomerList() {
             color="primary"
             variant="outlined"
             aria-label="Buscar cliente"
-            onClick={() => navigate('/novo-cliente')}
+            onClick={() => navigate('/cadastrar-cliente')}
           >
             Adicionar novo cliente
           </Button>
@@ -112,74 +79,23 @@ export default function CustomerList() {
       </Grid>
 
       <Grid item xs={12}>
-        <TableContainer component={Paper}>
-          <Table aria-label="Lista de clientes">
-            <TableHead>
-              <TableRow>
-                <NameColumn>Tipo</NameColumn>
-                <NameColumn>Nome</NameColumn>
-                <NameColumn>Nome fantasia</NameColumn>
-                <NameColumn>CPF / CNPJ</NameColumn>
-                <NameColumn>E-mail</NameColumn>
-                <NameColumn>Telefone</NameColumn>
-                <NameColumn></NameColumn>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {customers.length > 0 &&
-                customers.map((row, index) => (
-                  <TableRow key={row.name + index}>
-                    <TableCell sx={{ textAlign: 'center' }}>
-                      {row.type}
-                    </TableCell>
-                    <TableCell sx={{ minWidth: '180px' }}>{row.name}</TableCell>
-                    <TableCell sx={{ minWidth: '180px' }}>
-                      {'fantasy_name' in row &&
-                      row.fantasy_name &&
-                      row.type === 'PJ'
-                        ? row.fantasy_name
-                        : '-'}
-                    </TableCell>
-                    <TableCell sx={{ minWidth: '130px' }}>
-                      {row.type === 'PJ' ? row.cnpj : row.cpf}
-                    </TableCell>
-                    <TableCell sx={{ minWidth: '110px' }}>
-                      {row.email}
-                    </TableCell>
-                    <TableCell sx={{ minWidth: '110px' }}>
-                      {row.phone}
-                    </TableCell>
-
-                    <CustomCell padding="checkbox">
-                      <Stack
-                        m={1}
-                        spacing={1}
-                        direction="row"
-                        alignItems="center"
-                      >
-                        <IconButton
-                          size="medium"
-                          color="inherit"
-                          aria-label="Editar cliente"
-                        >
-                          <Edit fontSize="inherit" />
-                        </IconButton>
-
-                        <IconButton
-                          size="medium"
-                          color="error"
-                          aria-label="Excluir cliente"
-                        >
-                          <Delete fontSize="inherit" />
-                        </IconButton>
-                      </Stack>
-                    </CustomCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {isPending ? (
+          <Stack sx={{ width: '100%' }} spacing={2}>
+            <LinearProgress />
+          </Stack>
+        ) : isError ? (
+          <Stack sx={{ width: '100%' }} spacing={2}>
+            <Alert severity="error">
+              Ocorreu um erro interno ao buscar os dados da lista de clientes.
+            </Alert>
+          </Stack>
+        ) : (
+          <CustomersTable
+            customers={data}
+            onDelete={handleOpenDialog}
+            onEdit={(id: string) => navigate(`/editar-cliente/${id}`)}
+          />
+        )}
       </Grid>
     </Container>
   )
