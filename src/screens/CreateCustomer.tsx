@@ -60,7 +60,7 @@ export default function CreateCustomer() {
   })
 
   function handleGoBack() {
-    navigate(-1)
+    navigate('/', { replace: true })
   }
 
   function handleCloseNotification() {

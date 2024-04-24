@@ -69,7 +69,7 @@ export default function EditCustomer() {
   })
 
   function handleGoBack() {
-    navigate(-1)
+    navigate('/', { replace: true })
   }
 
   function handleCloseNotification() {
