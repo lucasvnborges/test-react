@@ -4,7 +4,15 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Business, Person, ArrowBack } from '@mui/icons-material'
-import { Container, Grid, IconButton, Typography } from '@mui/material'
+import {
+  Alert,
+  CircularProgress,
+  Container,
+  Grid,
+  IconButton,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { CustomerDataType, CustomerSchema } from 'src/models/customer'
 import { CustomerForm, CustomerTypeMenu, Notification } from 'src/components'
 import { NotificationType } from 'src/components/Notification'
@@ -13,7 +21,11 @@ import { getCustomerById, updateCustomer } from 'src/services/customerService'
 export default function EditCustomer() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const { data: customer } = useQuery({
+  const {
+    data: customer,
+    isPending,
+    isFetched,
+  } = useQuery({
     queryKey: ['customers', id],
     queryFn: () => !!id && getCustomerById(id),
   })
@@ -87,6 +99,21 @@ export default function EditCustomer() {
         </Typography>
       </Grid>
 
+      {isPending && !isFetched && (
+        <Stack sx={{ width: '100%' }} spacing={2} mb={3} alignItems="center">
+          <CircularProgress size={26} />
+        </Stack>
+      )}
+
+      {isFetched && !customer && (
+        <Stack sx={{ width: '100%' }} spacing={2} mb={3}>
+          <Alert severity="warning">
+            Não encontramos o ID do cliente informado. Por favor, retorne à
+            lista ou tente novamente.
+          </Alert>
+        </Stack>
+      )}
+
       <CustomerTypeMenu
         isEditing
         selectedOption={customerType}
@@ -102,6 +129,7 @@ export default function EditCustomer() {
         onSubmit={onSubmit}
         handleSubmit={handleSubmit}
         customerType={customerType}
+        disabled={isPending || (isFetched && !customer)}
       />
     </Container>
   )
