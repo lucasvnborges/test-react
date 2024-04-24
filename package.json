@@ -9,7 +9,6 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "jest --watch",
-    "test:unit": "vitest --root src/",
     "coverage": "pnpm run test --coverage --collectCoverageFrom='src/**/*.{ts,tsx}'"
   },
   "dependencies": {
@@ -50,7 +49,6 @@
     "typescript": "^5.2.2",
     "util": "^0.12.5",
     "vite": "^5.2.0",
-    "vitest": "^1.5.0",
     "zod": "^3.22.4",
     "zod-fixture": "^2.5.2"
   },
