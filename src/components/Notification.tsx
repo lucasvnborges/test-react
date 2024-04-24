@@ -7,24 +7,26 @@ export type NotificationStatus =
   | 'warning'
   | undefined
 
+export type NotificationType = {
+  message: string
+  visible: boolean
+  status?: NotificationStatus
+}
+
 type Props = {
   onClose: () => void
-  notification: {
-    message: string
-    visible: boolean
-    status?: NotificationStatus
-  }
+  notification: NotificationType
 }
 
 export default function Notification({
   onClose,
-  notification: { visible, status = 'info', message },
+  notification: { visible, status, message },
 }: Props) {
   return (
     <Snackbar
       open={visible}
       onClose={onClose}
-      autoHideDuration={6000}
+      autoHideDuration={5000}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
     >
       <Alert variant="filled" severity={status} onClose={onClose}>
