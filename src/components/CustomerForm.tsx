@@ -1,7 +1,7 @@
 import { Grid, TextField, Button } from '@mui/material'
 import { InputMaskCustom } from 'src/components'
 
-function CustomerForm({
+export default function CustomerForm({
   onSubmit,
   customerType,
   register,
@@ -108,5 +108,3 @@ function CustomerForm({
     </form>
   )
 }
-
-export default CustomerForm
