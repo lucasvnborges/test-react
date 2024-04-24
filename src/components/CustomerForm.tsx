@@ -7,6 +7,7 @@ export default function CustomerForm({
   register,
   errors,
   handleSubmit,
+  disabled = false
 }: any) {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -18,6 +19,7 @@ export default function CustomerForm({
               fullWidth
               id="cnpj"
               label="CNPJ"
+              disabled={disabled}
               error={'cnpj' in errors && !!errors.cnpj}
               helperText={'cnpj' in errors && errors.cnpj?.message}
               InputProps={{
@@ -35,6 +37,7 @@ export default function CustomerForm({
               fullWidth
               id="cpf"
               label="CPF"
+              disabled={disabled}
               error={'cpf' in errors && !!errors.cpf}
               helperText={'cpf' in errors && errors.cpf?.message}
               InputProps={{
@@ -52,6 +55,7 @@ export default function CustomerForm({
             {...register('name')}
             fullWidth
             id="name"
+            disabled={disabled}
             error={!!errors.name}
             helperText={errors.name?.message}
             label={customerType === 'PJ' ? 'Razão social' : 'Nome completo'}
@@ -65,6 +69,7 @@ export default function CustomerForm({
               fullWidth
               id="fantasy_name"
               label="Nome fantasia"
+              disabled={disabled}
               error={'fantasy_name' in errors && !!errors.fantasy_name}
               helperText={
                 'fantasy_name' in errors && errors.fantasy_name?.message
@@ -79,6 +84,7 @@ export default function CustomerForm({
             fullWidth
             id="email"
             label="E-mail"
+            disabled={disabled}
             error={!!errors.email}
             helperText={errors.email?.message}
           />
@@ -90,6 +96,7 @@ export default function CustomerForm({
             fullWidth
             id="phone"
             label="Telefone"
+            disabled={disabled}
             error={!!errors.phone}
             helperText={errors.phone?.message}
             InputProps={{
@@ -102,7 +109,7 @@ export default function CustomerForm({
         </Grid>
       </Grid>
 
-      <Button type="submit" variant="contained" sx={{ float: 'right' }}>
+      <Button type="submit" variant="contained" sx={{ float: 'right' }} disabled={disabled}>
         Salvar
       </Button>
     </form>
